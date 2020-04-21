@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+    triggers {
+        cron('0 */2 * * *')
+    }
+    stages {
+        stage("Pulling frontend"){
+            agent {label '114-debian'}
+            steps{
+                sh '''
+                cd /opt/schneider_frontend
+                git pull origin master
+                '''
+            }
+        }
+        stage("Starting frontend"){
+            agent {label '114-debian'}
+            steps{
+                sh '''
+                cd /opt/schneider_frontend
+                docker-compose up -d --build
+                docker system prune -f
+            '''
+            }
+        }
+    }
+    post {
+        success {
+            slackSend (
+                 channel: 'project_notification_sliaptsou',
+                 color: '#00FF00',
+                 message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+            )
+        }
+        failure {
+            slackSend (
+                 channel: 'project_notification_sliaptsou',
+                 color: '#FF0000',
+                 message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+             )
+        }
+    }
+}

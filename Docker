@@ -1,0 +1,39 @@
+node('114-debian'){
+        stage("Removing docker old versions"){
+            sh '''
+            sudo echo "Removing docker old versions"
+            sudo rm -rf /var/lib/docker
+            sudo rm /usr/bin/docker-compose
+            '''
+        }
+        stage("Removing docker-compose old versions"){
+            sh '''
+            sudo echo "Removing docker-compose old versions"
+            sudo rm /usr/local/bin/docker-compose
+            '''
+        }
+        stage("Installing docker"){
+            sh '''
+            sudo echo "Install docker"
+            sudo apt-get remove docker docker-engine docker.io
+            sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+            sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+            sudo apt-get install -yqq docker-ce docker-ce-cli containerd.io
+            sudo /usr/sbin/groupadd docker
+            sudo /usr/sbin/usermod -aG docker jenkins
+            sudo usermod -aG docker jenkins
+            '''
+        }
+        stage("Installing docker-compose"){
+            sh '''
+            sudo curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+            sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+            '''
+        }
+        stage('Slack it'){
+                slackSend channel: 'project_notification_sliaptsou',
+                          message: "${JOB_NAME}: ${currentBuild.currentResult}"
+        }
+}
