@@ -29,15 +29,16 @@ pipeline {
             slackSend (
                  channel: 'project_notification_sliaptsou',
                  color: '#00FF00',
-                 message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                 message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' took ${currentBuild.durationString}, more info: (${env.BUILD_URL})"
             )
         }
         failure {
             slackSend (
                  channel: 'project_notification_sliaptsou',
                  color: '#FF0000',
-                 message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                 message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' took ${currentBuild.durationString}, more info: (${env.BUILD_URL})"
              )
         }
     }
 }
+

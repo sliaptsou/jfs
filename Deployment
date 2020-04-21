@@ -8,7 +8,7 @@ pipeline {
                 sudo rm -rf /opt/schneider_frontend
                 sudo mkdir /opt/schneider_frontend
                 sudo chown jenkins /opt/schneider_frontend
-                git clone git@github.com:sliaptsou/schneider_frontend.git /opt/schneider_frontend
+                git clone --branch ${TAG_FRONTEND} git@github.com:sliaptsou/schneider_frontend.git /opt/schneider_frontend
                 '''
             }
         }
@@ -29,7 +29,7 @@ pipeline {
                 sudo rm -rf /opt/schneider_backend
                 sudo mkdir /opt/schneider_backend
                 sudo chown jenkins /opt/schneider_backend
-                git clone git@github.com:sliaptsou/schneider_backend.git /opt/schneider_backend
+                git clone --branch ${TAG_BACKEND} git@github.com:sliaptsou/schneider_backend.git /opt/schneider_backend
                 '''
             }
         }
@@ -49,14 +49,14 @@ pipeline {
             slackSend (
                  channel: 'project_notification_sliaptsou',
                  color: '#00FF00',
-                 message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                 message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' took ${currentBuild.durationString}, more info: (${env.BUILD_URL})"
             )
         }
         failure {
             slackSend (
                  channel: 'project_notification_sliaptsou',
                  color: '#FF0000',
-                 message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                 message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' took ${currentBuild.durationString}, more info: (${env.BUILD_URL})"
              )
         }
     }
