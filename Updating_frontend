@@ -1,11 +1,10 @@
 pipeline {
-    agent any
+    agent {label '114-debian'}
     triggers {
         cron('00 13,18 * * 1-5')
     }
     stages {
         stage("Pulling frontend"){
-            agent {label '114-debian'}
             steps{
                 sh '''
                 cd /opt/schneider_frontend
@@ -14,7 +13,6 @@ pipeline {
             }
         }
         stage("Starting frontend"){
-            agent {label '114-debian'}
             steps{
                 sh '''
                 cd /opt/schneider_frontend

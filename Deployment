@@ -1,8 +1,7 @@
 pipeline {
-    agent any
+    agent {label '114-debian'}
     stages {
         stage("Cloning frontend"){
-            agent {label '114-debian'}
             steps{
                 sh '''
                 sudo rm -rf /opt/schneider_frontend
@@ -13,7 +12,6 @@ pipeline {
             }
         }
         stage("Starting frontend"){
-            agent {label '114-debian'}
             steps{
                 sh '''
                 cd /opt/schneider_frontend
@@ -23,7 +21,6 @@ pipeline {
         }
 
         stage("Cloning backend"){
-            agent {label '114-debian'}
             steps{
                 sh '''
                 sudo rm -rf /opt/schneider_backend
@@ -34,7 +31,6 @@ pipeline {
             }
         }
         stage("Starting backend"){
-            agent {label '114-debian'}
             steps{
                 sh '''
                 cd /opt/schneider_backend

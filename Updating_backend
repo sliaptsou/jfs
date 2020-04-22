@@ -1,11 +1,10 @@
 pipeline {
-    agent any
+    agent {label '114-debian'}
     triggers {
         cron('00 13,18 * * 1-5')
     }
     stages {
         stage("Cloning backend"){
-            agent {label '114-debian'}
             steps{
                 sh '''
                 cd /opt/schneider_backend
@@ -14,7 +13,6 @@ pipeline {
             }
         }
         stage("Starting backend"){
-            agent {label '114-debian'}
             steps{
                 sh '''
                 cd /opt/schneider_backend
