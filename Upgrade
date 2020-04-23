@@ -1,7 +1,7 @@
 pipeline {
     agent {label '114-debian'}
     stages {
-        stage("Stop prev vesion"){
+        stage("Stop application"){
             steps{
                 sh '''
                 docker stop $(docker ps -a -q)
@@ -9,13 +9,11 @@ pipeline {
                 '''
             }
         }
-        stage("Cloning frontend"){
+        stage("Pulling frontend"){
             steps{
                 sh '''
-                sudo rm -rf /opt/schneider_frontend
-                sudo mkdir /opt/schneider_frontend
-                sudo chown jenkins /opt/schneider_frontend
-                git clone --branch ${TAG_FRONTEND} git@github.com:sliaptsou/schneider_frontend.git /opt/schneider_frontend
+                cd /opt/schneider_frontend
+                git pull origin master
                 '''
             }
         }
@@ -28,13 +26,11 @@ pipeline {
             }
         }
 
-        stage("Cloning backend"){
+        stage("Pulling backend"){
             steps{
                 sh '''
-                sudo rm -rf /opt/schneider_backend
-                sudo mkdir /opt/schneider_backend
-                sudo chown jenkins /opt/schneider_backend
-                git clone --branch ${TAG_BACKEND} git@github.com:sliaptsou/schneider_backend.git /opt/schneider_backend
+                cd /opt/schneider_backend
+                git pull origin master
                 '''
             }
         }
@@ -43,6 +39,12 @@ pipeline {
                 sh '''
                 cd /opt/schneider_backend
                 docker-compose up -d --build
+                '''
+            }
+        }
+        stage("Remove stopped containers"){
+            steps{
+                sh '''
                 docker system prune -f
                 '''
             }

@@ -4,7 +4,7 @@ pipeline {
         cron('H 9-18/3 * * 1-5')
     }
     stages {
-        stage("Cloning backend"){
+        stage("Pulling backend"){
             steps{
                 sh '''
                 cd /opt/schneider_backend
@@ -17,6 +17,12 @@ pipeline {
                 sh '''
                 cd /opt/schneider_backend
                 docker-compose up -d --build
+                '''
+            }
+        }
+        stage("Remove stopped containers"){
+            steps{
+                sh '''
                 docker system prune -f
                 '''
             }

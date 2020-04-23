@@ -17,8 +17,14 @@ pipeline {
                 sh '''
                 cd /opt/schneider_frontend
                 docker-compose up -d --build
+                '''
+            }
+        }
+        stage("Remove stopped containers"){
+            steps{
+                sh '''
                 docker system prune -f
-            '''
+                '''
             }
         }
     }
