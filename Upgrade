@@ -1,0 +1,67 @@
+pipeline {
+    agent {label '114-debian'}
+    stages {
+        stage("Stop prev vesion"){
+            steps{
+                sh '''
+                docker stop $(docker ps -a -q)
+                docker rm $(docker ps -a -q)
+                '''
+            }
+        }
+        stage("Cloning frontend"){
+            steps{
+                sh '''
+                sudo rm -rf /opt/schneider_frontend
+                sudo mkdir /opt/schneider_frontend
+                sudo chown jenkins /opt/schneider_frontend
+                git clone --branch ${TAG_FRONTEND} git@github.com:sliaptsou/schneider_frontend.git /opt/schneider_frontend
+                '''
+            }
+        }
+        stage("Starting frontend"){
+            steps{
+                sh '''
+                cd /opt/schneider_frontend
+                docker-compose up -d --build
+                '''
+            }
+        }
+
+        stage("Cloning backend"){
+            steps{
+                sh '''
+                sudo rm -rf /opt/schneider_backend
+                sudo mkdir /opt/schneider_backend
+                sudo chown jenkins /opt/schneider_backend
+                git clone --branch ${TAG_BACKEND} git@github.com:sliaptsou/schneider_backend.git /opt/schneider_backend
+                '''
+            }
+        }
+        stage("Starting backend"){
+            steps{
+                sh '''
+                cd /opt/schneider_backend
+                docker-compose up -d --build
+                docker system prune -f
+                '''
+            }
+        }
+    }
+    post {
+        success {
+            slackSend (
+                 channel: 'project_notification_sliaptsou',
+                 color: '#00FF00',
+                 message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' took ${currentBuild.durationString}, more info: (${env.BUILD_URL})"
+            )
+        }
+        failure {
+            slackSend (
+                 channel: 'project_notification_sliaptsou',
+                 color: '#FF0000',
+                 message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' took ${currentBuild.durationString}, more info: (${env.BUILD_URL})"
+             )
+        }
+    }
+}
