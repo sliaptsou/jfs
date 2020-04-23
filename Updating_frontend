@@ -1,7 +1,7 @@
 pipeline {
     agent {label '114-debian'}
     triggers {
-        cron('00 13,18 * * 1-5')
+        cron('H 9-18/3 * * 1-5')
     }
     stages {
         stage("Pulling frontend"){
